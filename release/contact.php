@@ -5,10 +5,10 @@
 	$file_field_separator = "\n"; //This string will be inserted between each field in the file produced
 	$use_file = true;
 	$use_email = false;
-	$to_email = "gilesjohn@hotmail.co.uk";
+	$to_email = "";
 	$use_captcha = true;
-	$secret_key = "6LfPYB0UAAAAAEfUSQrFItBEBETrQvfbhcKm9bqy";
-	$site_key = "6LfPYB0UAAAAANp4lOHzJLoX9ACUgujzNEuN3CPf"
+	$secret_key = "";
+	$site_key = ""
 	// NO MORE CODE IS NEEDED TO BE CHANGED DURING SETUP
 	$was_error = false;
 	$error_text = "";
