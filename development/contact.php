@@ -3,7 +3,7 @@
 
 	// Implementation specific constants
 	// REQUIRE SETTING DURING SETUP
-	$contact_store = "contacts/"; //Location to store contact files, full path or DOC_ROOT prepended if you want
+	$contact_store = "contacts/"; //Location to store contact files, full path or DOC_ROOT prepended if you want, DIRECTORY MUST EXIST
 	$required_fields = array("name", "email", "subject", "message");//All fields are required, optional fields should be included in this list, and send a dummy value if empty
 	$file_field_separator = "\n"; //This string will be inserted between each field in the file produced
 	// NO MORE CODE IS NEEDED TO BE CHANGED DURING SETUP
