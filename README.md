@@ -2,8 +2,9 @@
 Simple PHP contact page
 
 # Requirements:
- - Standard PHP 5 setup
+ - Standard PHP 5 setup with working mail function
  - Apache Web Server
+ - Invisible recaptcha
 
 # Setup Instructions:
 These instructions are for a specific user of this software, you may require a different setup

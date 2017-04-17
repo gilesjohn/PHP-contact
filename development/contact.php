@@ -6,6 +6,12 @@
 	$contact_store = "contacts/"; //Location to store contact files, full path or DOC_ROOT prepended if you want, DIRECTORY MUST EXIST
 	$required_fields = array("name", "email", "subject", "message");//All fields are required, optional fields should be included in this list, and send a dummy value if empty
 	$file_field_separator = "\n"; //This string will be inserted between each field in the file produced
+	$use_file = true;
+	$use_email = false;
+	$to_email = "gilesjohn@hotmail.co.uk";
+	$use_captcha = true;
+	$secret_key = "6LfPYB0UAAAAAEfUSQrFItBEBETrQvfbhcKm9bqy";
+	$site_key = "6LfPYB0UAAAAANp4lOHzJLoX9ACUgujzNEuN3CPf"
 	// NO MORE CODE IS NEEDED TO BE CHANGED DURING SETUP
 
 	// Initialise variables with defaults
@@ -73,6 +79,44 @@
 		return $file_text;
 	}
 
+	/* send_email - Send $content to mail address specified in $to_email
+	 *
+	 * Param	$content	String to send
+	 * Return	bool	False if failure
+	 */
+	function send_email($content) {
+		global $to_email;
+		$msg = $content;
+		$msg = wordwrap($msg,70);
+		return mail($to_email,"Contact Form Submission",$msg);
+	}
+
+	/* send_email - Send $content to mail address specified in $to_email
+	 *
+	 * Param	$content	String to send
+	 * Return	bool	true only if success, probably false on failure but not guarranteed 
+	 */
+	function check_captcha() {
+		global $secret_key;
+		$url = "https://www.google.com/recaptcha/api/siteverify";
+		$data = array("secret" => $secret_key, "response" => $_POST["g-recaptcha-response"], "remoteip" => $_SERVER['REMOTE_ADDR']);
+		$options = array(
+			'http' => array(
+				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+				'method'  => 'POST',
+				'content' => http_build_query($data)
+			)
+		);
+		$context  = stream_context_create($options);
+		$result = file_get_contents($url, false, $context);
+		if ($result === FALSE) { /* Handle error */ }
+		$result = json_decode($result, true);
+		if (!isset($result["success"])) {
+			return false;
+		}
+		return $result["success"];
+	}
+
 
 
     // Main logic
@@ -83,25 +127,57 @@
 	 *	Create a uniqure file in the $contact_store directory
 	 *	Store the formatted string in the uniqure file
 	 */
-
-	if (values_are_set($_POST, $required_fields)) {
-		$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
-		$file_name = tempnam($contact_store, "contact-");
-		
-		if ($file_name !== false && file_put_contents($file_name, $file_text) !== false) {
-			success("Message sent.");
-		} else {
-			error("Couldn't complete contacting process, please try again later.");
+	if (count($_POST) > 0) {
+		if ($use_captcha) {
+			if (check_captcha() !== true) {
+				exit("Failed bot detection test.");
+			}
+		}
+		if (values_are_set($_POST, $required_fields)) {
+			$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
+			
+			if ($use_file) {
+				$file_name = tempnam($contact_store, "contact-");
+				if ($file_name === false) {
+					error("Couldn't complete contacting process, please try again later.");
+				} else if (file_put_contents($file_name, $file_text) === false) {
+					error("Couldn't complete contacting process, please try again later.");
+				}
+			}
+			
+			if ($use_email) {
+				if (send_email($file_text) === false) {
+					error("Couldn't complete contacting process, please try again later.");
+				}
+			}
+				
+				
+			if (!$was_error) {
+				success("Message sent.");
+			}
 		}
 	}
 ?>
 
 <!DOCTYPE html>
 <html>
-	<head></head>
+	<head>
+	
+	<?php
+		if ($use_captcha) {
+			echo("<script src='https://www.google.com/recaptcha/api.js'></script>
+			<script>
+			   function onSubmit(token) {
+				 document.getElementById('contact-form').submit();
+			   }
+     		</script>
+			");
+		}
+	?>
+	</head>
 	<body>
 
-		<form action="" method="POST">
+		<form action="" method="POST" id="contact-form">
 			<p id="error-message" style="color: red">
 				<?php
 					// Code to display error text in correct location if a problem occurred
@@ -113,6 +189,7 @@
 			<p id="success-message" style="color: green">
 				<?php
 					// Code to display success text in correct location if script succeeded
+					
 					if ($was_success) {
 						echo $success_text;
 					}
@@ -130,7 +207,20 @@
 			<label for="subject">Message</label><br>
 			<textarea id="message" name="message" placeholder="Your message..." rows="8" cols="50"></textarea>
 			<br>
-			<input type="submit" value="Submit">
+			
+			<?php
+			if ($use_captcha) {
+				echo("<button
+				class='g-recaptcha'
+				data-sitekey='" . $site_key . "'
+				data-callback='onSubmit'>
+				Submit
+				</button>");
+			} else {
+				echo('<input type="submit" value="Submit">');
+			}
+			?>
+			
 		</form>
 
 		<?php //Testing section
