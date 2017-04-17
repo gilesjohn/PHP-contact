@@ -11,7 +11,7 @@
 	$to_email = "gilesjohn@hotmail.co.uk";
 	$use_captcha = true;
 	$secret_key = "6LfPYB0UAAAAAEfUSQrFItBEBETrQvfbhcKm9bqy";
-	$site_key = "6LfPYB0UAAAAANp4lOHzJLoX9ACUgujzNEuN3CPf"
+	$site_key = "6LfPYB0UAAAAANp4lOHzJLoX9ACUgujzNEuN3CPf";
 	// NO MORE CODE IS NEEDED TO BE CHANGED DURING SETUP
 
 	// Initialise variables with defaults
