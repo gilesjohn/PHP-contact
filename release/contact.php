@@ -1,17 +1,13 @@
 <?php
-	// CHANGE HERE
-	$contact_store = "/Users/gilesholdsworth/Dropbox/programming/github/PHP-contact/contacts/";
-	$required_fields = array("name", "email", "subject", "message");
-	// TO HERE as necessary
+	// CHANGE BETWEEN HERE
+	$contact_store = "contacts/"; //Location to store contact files, full path or DOC_ROOT prepended if you want
+	$required_fields = array("name", "email", "subject", "message");//All fields are required, optional fields should be included in this list, and send a dummy value if empty
+	$file_field_separator = "\n"; //This string will be inserted between each field in the file produced
+	// AND HERE
 	$was_error = false;
 	$error_text = "";
 	$was_success = false;
 	$success_text = "";
-	$name = "";
-	$email = "";
-	$subject = "";
-	$message = "";
-	$file_text = "";
 	function error($text) {
 		global $was_error, $error_text;
 		$was_error = true;
@@ -22,10 +18,10 @@
 		$was_success = true;
 		$success_text .= "Success: " . $text . "<br>\n";
 	}
-	function posts_are_set($post, $names) {//return true if string variables are set and have some characters, false if not
+	function values_are_set($dict, $names) {
 		$return_bool = false;
 		foreach ($names as $name) {
-			$return_bool = (isset($post[$name]) && strlen($post[$name]) > 0);
+			$return_bool = (isset($dict[$name]) && strlen($dict[$name]) > 0);
 			if (!$return_bool) {
 				error(ucfirst($name) . " field not filled out.");
 				break;
@@ -33,25 +29,22 @@
 		}
 		return $return_bool;
 	}
-	function format_file_text($name, $email, $subject, $message) {
-		return $name . "\n" . $email . "\n" .  $subject . "\n" . $message;
+	function format_file_text($dict, $names, $file_field_separator) {
+		$file_text = "";
+		foreach ($names as $name) {
+			$file_text .= $dict[$name] . $file_field_separator;
+		}
+		return $file_text;
 	}
-	if (posts_are_set($_POST, $required_fields)) {
-		$name = $_POST["name"];
-		$email = $_POST["email"];
-		$subject = $_POST["subject"];
-		$message = $_POST["message"];
-		
-		$file_text = format_file_text($name, $email, $subject, $message);
+	if (values_are_set($_POST, $required_fields)) {
+		$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
 		$file_name = tempnam($contact_store, "contact-");
-		if ($file_name !== false && file_put_contents($file_name, $file_text) =!== false) {
-				throw new Exception("error");
-			}
+		
+		if ($file_name !== false && file_put_contents($file_name, $file_text) !== false) {
 			success("Message sent.");
 		} else {
 			error("Couldn't complete contacting process, please try again later.");
 		}
-
 	}
 ?>
 
@@ -59,7 +52,6 @@
 <html>
 	<head></head>
 	<body>
-
 		<form action="" method="POST">
 			<p id="error-message" style="color: red">
 				<?php
@@ -91,4 +83,3 @@
 		</form>
 	</body>
 </html>
-
