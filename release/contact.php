@@ -8,7 +8,7 @@
 	$to_email = "";
 	$use_captcha = true;
 	$secret_key = "";
-	$site_key = ""
+	$site_key = "";
 	// NO MORE CODE IS NEEDED TO BE CHANGED DURING SETUP
 	$was_error = false;
 	$error_text = "";
