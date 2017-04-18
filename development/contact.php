@@ -133,7 +133,9 @@
 				exit("Failed bot detection test.");
 			}
 		}
-		if (values_are_set($_POST, $required_fields)) {
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL) {
+			error("Invalid email address.");
+		} else if (values_are_set($_POST, $required_fields)) {
 			$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
 			
 			if ($use_file) {
@@ -148,6 +150,8 @@
 			}
 			
 			if ($use_email) {
+				$file_text = stripslashes($file_text);
+				$file_text = htmlspecialchars($file_text);
 				if (send_email($file_text) === false) {
 					error("Couldn't complete contacting process, please try again later.");
 				}
