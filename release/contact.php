@@ -74,7 +74,9 @@
 				exit("Failed bot detection test.");
 			}
 		}
-		if (values_are_set($_POST, $required_fields)) {
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL) {
+			error("Invalid email address.");
+		} else if (values_are_set($_POST, $required_fields)) {
 			$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
 			if ($use_file) {
 				$file_name = tempnam($contact_store, "contact-");
