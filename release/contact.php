@@ -78,6 +78,8 @@
 			$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
 			if ($use_file) {
 				$file_name = tempnam($contact_store, "contact-");
+				rename($file_name, $file_name . ".txt");
+				$file_name .= ".txt";
 				if ($file_name === false) {
 					error("Couldn't complete contacting process, please try again later.");
 				} else if (file_put_contents($file_name, $file_text) === false) {
