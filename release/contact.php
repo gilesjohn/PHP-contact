@@ -40,6 +40,7 @@
 		foreach ($names as $name) {
 			$file_text .= $dict[$name] . $file_field_separator;
 		}
+		$file_text = str_replace('\\',"",$file_text);
 		return $file_text;
 	}
 	function send_email($content) {
