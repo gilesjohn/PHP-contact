@@ -134,33 +134,31 @@
 				exit("Failed bot detection test.");
 			}
 		}
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			error("Invalid email address.");
-		} else if (values_are_set($_POST, $required_fields)) {
-			$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
-			
-			if ($use_file) {
-				$file_name = tempnam($contact_store, "contact-");
-				rename($file_name, $file_name . ".txt");
-				$file_name .= ".txt";
-				if ($file_name === false) {
-					error("Couldn't complete contacting process, please try again later.");
-				} else if (file_put_contents($file_name, $file_text) === false) {
-					error("Couldn't complete contacting process, please try again later.");
-				}
-			}
-			
-			if ($use_email) {
-				$file_text = stripslashes($file_text);
-				$file_text = htmlspecialchars($file_text);
-				if (send_email($file_text) === false) {
-					error("Couldn't complete contacting process, please try again later.");
-				}
-			}
+		if (values_are_set($_POST, $required_fields)) {
+			if (filter_var($_POST["email"], FILTER_VALIDATE_EMAIL) !== false) {
 				
+				$file_text = format_file_text($_POST, $required_fields, $file_field_separator);
+				if ($use_file) {
+					$file_name = tempnam($contact_store, "contact-");
+					rename($file_name, $file_name . ".txt");
+					$file_name .= ".txt";
+					if ($file_name === false) {
+						error("Couldn't complete contacting process, please try again later.");
+					} else if (file_put_contents($file_name, $file_text) === false) {
+						error("Couldn't complete contacting process, please try again later.");
+					}
+				}
+				if ($use_email) {
+					if (send_email($file_text) === false) {
+						error("Couldn't complete contacting process, please try again later.");
+					}
+				}
+				if (!$was_error) {
+					success("Message sent.");
+				}
 				
-			if (!$was_error) {
-				success("Message sent.");
+			} else {
+				error("Invalid email address.");
 			}
 		}
 	}
@@ -203,16 +201,32 @@
 				?>
 			</p>
 			<label for="name">Name</label><br>
-			<input type="text" id="name" name="name" placeholder="Your name...">
+			<input type="text" id="name" name="name" placeholder="Your name..." value="<?php
+				if (isset($_POST["name"]) && $was_error === true) {
+					echo htmlspecialchars($_POST["name"]);
+				}
+			?>">
 			<br>
 			<label for="email">Email</label><br>
-			<input type="text" id="email" name="email" placeholder="Your email...">
+			<input type="text" id="email" name="email" placeholder="Your email..." value="<?php
+				if (isset($_POST["email"]) && $was_error === true) {
+					echo htmlspecialchars($_POST["email"]);
+				}
+			?>">
 			<br>
 			<label for="subject">Subject</label><br>
-			<input type="text" id="subject" name="subject" placeholder="Subject...">
+			<input type="text" id="subject" name="subject" placeholder="Subject..." value="<?php
+				if (isset($_POST["subject"]) && $was_error === true) {
+					echo htmlspecialchars($_POST["subject"]);
+				}
+			?>">
 			<br>
 			<label for="subject">Message</label><br>
-			<textarea id="message" name="message" placeholder="Your message..." rows="8" cols="50"></textarea>
+			<textarea id="message" name="message" placeholder="Your message..." rows="8" cols="50" value="<?php
+				if (isset($_POST["message"]) && $was_error === true) {
+					echo htmlspecialchars($_POST["message"]);
+				}
+			?>"></textarea>
 			<br>
 			
 			<?php
